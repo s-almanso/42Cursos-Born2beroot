@@ -1,0 +1,145 @@
+Evaluation walkthrough | Walkthrough the VM
+
+----------------
+|     Setup    |
+----------------
+After logging in:
+
+- Check UFW:
+$ sudo ufw status
+
+- Check that the SSH is started:
+$ sudo systemctl status ssh
+
+(in terminal)
+$ ssh <username>@127.0.0.1 -p 4242
+
+- Check that the chosen operating system is Debian or CentOS:
+$ uname -v
+
+----------------
+|     USER      |
+----------------
+
+-Check the user is added to the sudo group & user42 Group:
+$ getent group sudo
+$ getent group <group_name>
+
+- Delete a user or group:
+$ sudo userdel <username>
+$ sudo groupdel <group>
+
+- Check Password policy:
+$ sudo vim /etc/pam.d/common-password
+$ sudo chage -l <user>
+
+> pass at least 10char long : minlen = 10
+> min one upper-case letter: ucredit = -1
+> min one lower-case letter: lcredit = -1
+> min one digit: dcredit = -1
+> max same letter repetition 3: maxrepeat=3
+> check if the password contains the username: usercheck=1
+> min number of charachters different from the old pass: difok=7
+> same policy for root: enforce_for_root
+
+- Password Expiration:
+$ sudo vim /etc/login.defs
+
+- Create a new user & group:
+$ sudo adduser <new_username>
+$ sudo addgroup <new_groupname>
+
+- Check if the new_group was created:
+$ getent group
+
+- assign the new_user to the new_group:
+$ sudo usermod -aG <new_group> <new_username>
+
+- Check if user in Group:
+$ getent group <new_group>
+
+- Check if password rules apply to user:
+$ chage -l <new_username>
+
+---------------------------
+| Hostname and partitions |
+---------------------------
+
+- Check current hostname:
+$ sudo hostnamectl status
+
+- Change the hostname:
+$ hostnamectl set-hostname <new_hostname>
+> change the hostname in the hosts file:
+$ sudo vim /etc/hosts
+> replace the old_hostname with the new_hostname
+$ sudo reboot
+
+- View the partition:
+$ lsblk
+> LVM is more dynamical and flexible
+
+-----------------
+|      SUDO     |
+-----------------
+
+- Check that "sudo" program is installed:
+$ sudo -V
+$ sudo dpkg -l | grep sudo
+
+- Assign new user to the "sudo" group.
+$ usermod -aG sudo <new_user>
+
+- Check if it was successfully assigned:
+$ getent group sudo
+
+- Strict rules for sudo;
+$ sudo visudo
+
+$ sudo vim /var/log/sudo/sudo.log
+---------------
+|     UFW     |s
+---------------
+
+- Check that the "UFW is installed:
+$ dpkg -l | grep ufw
+
+- Check that it is working properly.
+$ sudo ufw status
+
+- List the active rules in UFW:
+$ sudo ufw status
+
+- Add a new rule to open port 8080 then delete it:
+$ sudo ufw allow <8080>
+$ sudo ufw status numbered
+$ sudo ufw delete <number>
+
+---------------
+|     SSH     |
+---------------
+
+- Check SSH installed:
+$ dpkg -l | grep ssh
+
+- Check that it is working properly.
+$ sudo systemctl status ssh
+
+> login via terminal
+$ ssh <username>@127.0.0.1 -p 4242
+
+- Verify that the SSH service only uses port 4242.
+$ sudo servive ssh status
+
+------------------------
+|   Script monitoring  |
+------------------------
+
+- What "cron" is:
+cron allow proccesses to be run at a specific scheduled times.
+
+- How to run script every 10mins:
+$ sudo crontab -u root -e
+$ sudo crontab -u root -ls
+
+"wall" is added in order to apply it to all users
